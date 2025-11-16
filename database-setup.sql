@@ -1,23 +1,24 @@
--- BookHub Database Setup Script
+-- BookHub Database Setup Script for PostgreSQL (Aiven)
 -- This script creates the database and table structure for the BookHub application
 -- Note: Hibernate will automatically create the table if hibernate.hbm2ddl.auto=update
 -- This script is provided for manual setup if needed
 
--- Create database
-CREATE DATABASE IF NOT EXISTS bookhub_db;
+-- Note: For Aiven PostgreSQL, the database is usually pre-created (e.g., defaultdb)
+-- You may need to create a new database if required:
+-- CREATE DATABASE bookhub_db;
 
--- Use the database
-USE bookhub_db;
+-- Connect to your database (replace with your database name)
+-- \c bookhub_db;
 
 -- Create books table
 -- This matches the Book entity structure
 CREATE TABLE IF NOT EXISTS books (
-    book_id BIGINT NOT NULL AUTO_INCREMENT,
+    book_id BIGSERIAL NOT NULL,
     title VARCHAR(200) NOT NULL,
     author VARCHAR(100) NOT NULL,
-    price DOUBLE NOT NULL,
+    price DOUBLE PRECISION NOT NULL,
     PRIMARY KEY (book_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+);
 
 -- Optional: Insert sample data for testing
 -- Uncomment the following lines if you want to start with sample books
@@ -30,17 +31,15 @@ CREATE TABLE IF NOT EXISTS books (
 -- ('The Catcher in the Rye', 'J.D. Salinger', 10.99);
 
 -- Verify table creation
-SHOW TABLES;
+SELECT tablename FROM pg_tables WHERE schemaname = 'public';
 
 -- Show table structure
-DESCRIBE books;
+SELECT column_name, data_type, character_maximum_length
+FROM information_schema.columns
+WHERE table_name = 'books';
 
 -- Show current records (will be empty if no sample data inserted)
 SELECT * FROM books;
-
--- Grant privileges (adjust username if needed)
--- GRANT ALL PRIVILEGES ON bookhub_db.* TO 'root'@'localhost';
--- FLUSH PRIVILEGES;
 
 -- Script completed successfully
 SELECT 'BookHub database setup completed!' AS Status;
