@@ -10,7 +10,7 @@
 ### 2. **Dependencies (pom.xml)**
 - Spring Framework 5.3.20 (MVC, ORM, Transaction Management)
 - Hibernate 5.6.9.Final (ORM Framework)
-- MySQL Connector 8.0.29
+- PostgreSQL JDBC Driver 42.6.0
 - Apache Commons DBCP2 2.9.0 (Connection Pooling)
 - JSP and JSTL support
 - ✅ All dependencies verified - No security vulnerabilities
@@ -93,7 +93,7 @@
 - DataSource configuration with connection pooling
 - Hibernate SessionFactory setup
 - Hibernate properties:
-  - MySQL8Dialect
+  - PostgreSQLDialect
   - Show SQL (for debugging)
   - Auto DDL update
   - Spring session context
@@ -101,17 +101,17 @@
 
 ### 8. **Database Configuration**
 **database.properties**:
-- MySQL JDBC driver configuration
-- Database URL: jdbc:mysql://localhost:3306/bookhub_db
+- PostgreSQL JDBC driver configuration
+- Database URL: jdbc:postgresql://YOUR_AIVEN_HOST:YOUR_AIVEN_PORT/YOUR_DATABASE_NAME?sslmode=require
 - Configurable username and password
-- SSL and timezone settings
+- SSL connection support for Aiven
 
 ### 9. **Documentation**
 **README.md** - Comprehensive guide with:
 - Feature overview with emojis
-- Prerequisites (JDK, Maven, MySQL, Tomcat, VS Code)
+- Prerequisites (JDK, Maven, Aiven PostgreSQL, Tomcat, VS Code)
 - VS Code setup with required extensions
-- Database setup instructions
+- Aiven PostgreSQL setup instructions
 - 3 different deployment methods
 - Step-by-step running instructions
 - Usage guide for each page
@@ -141,7 +141,7 @@
 1. **Add Books** - Users can add new books with title, author, and price
 2. **View Books** - Display all books in a formatted table
 3. **Navigation** - Easy navigation between pages
-4. **Data Persistence** - All data stored in MySQL database
+4. **Data Persistence** - All data stored in Aiven PostgreSQL database
 
 ### Technical Features:
 1. **MVC Pattern** - Clean separation of concerns
@@ -165,7 +165,7 @@ BookController (Spring MVC)
     ↓
 BookDAO/BookDAOImpl (Hibernate)
     ↓
-MySQL Database (bookhub_db)
+Aiven PostgreSQL Database (Cloud)
     ↓
 JSP View (home.jsp, addBook.jsp, viewBooks.jsp)
     ↓
