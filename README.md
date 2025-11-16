@@ -2,6 +2,12 @@
 
 A complete Spring MVC web application for managing books using Hibernate and MySQL database. Users can add books with title, author, and price, and view all books in the system.
 
+## 📖 Documentation
+
+- **[QUICKSTART.md](QUICKSTART.md)** - Get started in 5 minutes!
+- **[IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md)** - Detailed implementation overview
+- **[database-setup.sql](database-setup.sql)** - SQL script for manual database setup
+
 ## 🚀 Features
 
 - **Add Books**: Add new books with title, author, and price
