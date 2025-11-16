@@ -1,6 +1,6 @@
 # 📚 BookHub - Spring MVC Web Application
 
-A complete Spring MVC web application for managing books using Hibernate and MySQL database. Users can add books with title, author, and price, and view all books in the system.
+A complete Spring MVC web application for managing books using Hibernate and Aiven PostgreSQL database. Users can add books with title, author, and price, and view all books in the system.
 
 ## 📖 Documentation
 
@@ -14,7 +14,7 @@ A complete Spring MVC web application for managing books using Hibernate and MyS
 - **View Books**: Display all books in a beautiful table format
 - **Spring MVC**: Full MVC architecture with Spring Framework
 - **Hibernate ORM**: Database operations using Hibernate
-- **MySQL Database**: Persistent storage with MySQL
+- **Aiven PostgreSQL**: Cloud-hosted PostgreSQL database with SSL support
 - **JSP Views**: Modern and responsive UI with JSP pages
 
 ## 📋 Prerequisites
@@ -29,9 +29,10 @@ Before running this application, make sure you have the following installed:
    - Download from: https://maven.apache.org/download.cgi
    - Verify installation: `mvn -version`
 
-3. **MySQL Server**
-   - Download from: https://dev.mysql.com/downloads/mysql/
-   - Verify installation: `mysql --version`
+3. **Aiven PostgreSQL Database**
+   - Sign up for free at: https://aiven.io
+   - Create a PostgreSQL service
+   - Note down your connection details (host, port, username, password, database name)
 
 4. **Apache Tomcat 9.x**
    - Download from: https://tomcat.apache.org/download-90.cgi
@@ -65,59 +66,64 @@ Open VS Code and install these extensions:
 
 ## 📦 Database Setup
 
-### Step 1: Start MySQL Server
+### Step 1: Create Aiven PostgreSQL Service
 
-**On Windows:**
-```bash
-# Start MySQL service
-net start MySQL80
-```
+1. **Sign up for Aiven (if you haven't already)**
+   - Visit https://aiven.io
+   - Create a free account
+   - Verify your email
 
-**On macOS/Linux:**
-```bash
-# Start MySQL service
-sudo systemctl start mysql
-# or
-sudo service mysql start
-```
+2. **Create a PostgreSQL Service**
+   - Log in to Aiven Console
+   - Click "Create Service"
+   - Select "PostgreSQL"
+   - Choose a cloud provider and region
+   - Select a service plan (free tier available)
+   - Give your service a name (e.g., "bookhub-db")
+   - Click "Create Service"
+   - Wait for the service to start (typically 5-10 minutes)
 
-### Step 2: Create Database
+3. **Get Connection Details**
+   - Once the service is running, go to the "Overview" tab
+   - You'll find:
+     - **Host**: (e.g., bookhub-db-project.aivencloud.com)
+     - **Port**: (e.g., 12345)
+     - **User**: (typically "avnadmin")
+     - **Password**: (click to reveal)
+     - **Database**: (typically "defaultdb")
+   - Keep these details handy for the next step
 
-1. Open MySQL command line or MySQL Workbench
-2. Login with your credentials:
-```bash
-mysql -u root -p
-```
-
-3. Create the database:
-```sql
-CREATE DATABASE bookhub_db;
-```
-
-4. Verify the database was created:
-```sql
-SHOW DATABASES;
-```
-
-5. Exit MySQL:
-```sql
-exit;
-```
-
-### Step 3: Configure Database Credentials
+### Step 2: Configure Database Credentials
 
 Update the database credentials in `src/main/resources/database.properties`:
 
 ```properties
-db.driver=com.mysql.cj.jdbc.Driver
-db.url=jdbc:mysql://localhost:3306/bookhub_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-db.username=root
-db.password=YOUR_MYSQL_PASSWORD
+# Aiven PostgreSQL Database Configuration
+db.driver=org.postgresql.Driver
+db.url=jdbc:postgresql://YOUR_AIVEN_HOST:YOUR_AIVEN_PORT/YOUR_DATABASE_NAME?sslmode=require
+db.username=YOUR_AIVEN_USERNAME
+db.password=YOUR_AIVEN_PASSWORD
 ```
 
-Replace `YOUR_MYSQL_PASSWORD` with your actual MySQL root password.
+Replace the placeholders with your actual Aiven PostgreSQL credentials:
+- `YOUR_AIVEN_HOST`: Your Aiven PostgreSQL host
+- `YOUR_AIVEN_PORT`: Your Aiven PostgreSQL port
+- `YOUR_DATABASE_NAME`: Your database name (e.g., "defaultdb")
+- `YOUR_AIVEN_USERNAME`: Your Aiven username
+- `YOUR_AIVEN_PASSWORD`: Your Aiven password
 
-**Note:** The application will automatically create the `books` table on first run thanks to Hibernate's `hibernate.hbm2ddl.auto=update` setting.
+**Example:**
+```properties
+db.driver=org.postgresql.Driver
+db.url=jdbc:postgresql://bookhub-db-project.aivencloud.com:12345/defaultdb?sslmode=require
+db.username=avnadmin
+db.password=your_secure_password_here
+```
+
+**Note:** 
+- The `sslmode=require` parameter ensures secure SSL connection to Aiven
+- The application will automatically create the `books` table on first run thanks to Hibernate's `hibernate.hbm2ddl.auto=update` setting
+- No need to manually create the database or tables!
 
 ## 🏃 Running the Application in VS Code
 
@@ -155,6 +161,8 @@ Open your browser and navigate to:
 ```
 http://localhost:8080/BookHub/books/
 ```
+
+**Note:** On first run, the application will connect to your Aiven PostgreSQL database and automatically create the necessary tables.
 
 ### Method 2: Using Maven and External Tomcat
 
@@ -240,10 +248,17 @@ mvn tomcat7:run
 
 ### Issue: "Unable to connect to database"
 **Solution:**
-- Verify MySQL server is running
+- Verify your Aiven PostgreSQL service is running
 - Check database credentials in `database.properties`
-- Ensure database `bookhub_db` exists
-- Check MySQL is listening on port 3306
+- Ensure the connection URL includes `?sslmode=require`
+- Verify your IP is allowed (Aiven allows all IPs by default)
+- Check that the PostgreSQL JDBC driver is included in pom.xml
+
+### Issue: "SSL connection failed"
+**Solution:**
+- Ensure your connection URL has `?sslmode=require` parameter
+- Aiven requires SSL connections for security
+- Update to the latest PostgreSQL JDBC driver if needed
 
 ### Issue: "Port 8080 already in use"
 **Solution:**
@@ -299,7 +314,7 @@ BookHub/
 - **Java 8+**: Programming language
 - **Spring Framework 5.3.20**: MVC and dependency injection
 - **Hibernate 5.6.9**: ORM framework
-- **MySQL 8.0+**: Database
+- **Aiven PostgreSQL**: Cloud-hosted PostgreSQL database with SSL
 - **JSP & JSTL**: View layer
 - **Maven**: Build and dependency management
 - **Apache Tomcat 9**: Application server
@@ -324,7 +339,8 @@ BookHub/
 
 ### database.properties
 - Database connection settings
-- MySQL credentials and URL
+- Aiven PostgreSQL credentials and URL
+- SSL connection configuration
 
 ## 🤝 Contributing
 
@@ -339,15 +355,17 @@ This project is open source and available for educational purposes.
 For issues and questions:
 1. Check the Troubleshooting section above
 2. Review Tomcat logs in `logs/catalina.out`
-3. Verify MySQL connection and database setup
+3. Verify Aiven PostgreSQL connection and credentials
 4. Ensure all dependencies are properly installed
+5. Check Aiven service status in the Aiven Console
 
 ## 🎓 Learning Resources
 
 - [Spring Framework Documentation](https://docs.spring.io/spring-framework/docs/current/reference/html/)
 - [Hibernate Documentation](https://hibernate.org/orm/documentation/)
 - [Maven Guide](https://maven.apache.org/guides/)
-- [MySQL Documentation](https://dev.mysql.com/doc/)
+- [PostgreSQL Documentation](https://www.postgresql.org/docs/)
+- [Aiven Documentation](https://docs.aiven.io/)
 
 ---
 

@@ -5,28 +5,49 @@ Get BookHub running in 5 minutes!
 ## Prerequisites Checklist
 - [ ] Java JDK 8+ installed
 - [ ] Maven installed
-- [ ] MySQL Server installed and running
+- [ ] Aiven PostgreSQL service created
 - [ ] Apache Tomcat 9.x downloaded
 - [ ] VS Code with Java extensions installed
 
 ## Step-by-Step Setup
 
-### 1. Database Setup (2 minutes)
+### 1. Aiven PostgreSQL Setup (3 minutes)
 ```bash
-# Login to MySQL
-mysql -u root -p
-
-# Create database
-CREATE DATABASE bookhub_db;
-exit;
+# Go to https://aiven.io and create a free account
+# Create a new PostgreSQL service:
+# 1. Click "Create Service"
+# 2. Select "PostgreSQL"
+# 3. Choose your preferred cloud provider and region
+# 4. Select a service plan (free tier available)
+# 5. Click "Create Service"
+# 6. Wait for service to start (5-10 minutes)
+# 7. Note down your connection details from the Overview tab:
+#    - Host, Port, User, Password, Database name
 ```
 
-### 2. Configure Database (30 seconds)
+### 2. Configure Database (1 minute)
 Edit `src/main/resources/database.properties`:
 ```properties
-db.password=YOUR_MYSQL_PASSWORD
+db.driver=org.postgresql.Driver
+db.url=jdbc:postgresql://YOUR_AIVEN_HOST:YOUR_AIVEN_PORT/YOUR_DATABASE_NAME?sslmode=require
+db.username=YOUR_AIVEN_USERNAME
+db.password=YOUR_AIVEN_PASSWORD
 ```
-Replace `YOUR_MYSQL_PASSWORD` with your actual MySQL password.
+
+Replace placeholders with your actual Aiven PostgreSQL credentials:
+- `YOUR_AIVEN_HOST`: Your Aiven host (e.g., bookhub-db.aivencloud.com)
+- `YOUR_AIVEN_PORT`: Your Aiven port (e.g., 12345)
+- `YOUR_DATABASE_NAME`: Database name (e.g., defaultdb)
+- `YOUR_AIVEN_USERNAME`: Username (typically avnadmin)
+- `YOUR_AIVEN_PASSWORD`: Your Aiven password
+
+**Example:**
+```properties
+db.driver=org.postgresql.Driver
+db.url=jdbc:postgresql://bookhub-db-abc123.aivencloud.com:12345/defaultdb?sslmode=require
+db.username=avnadmin
+db.password=your_secure_password
+```
 
 ### 3. Build Application (1 minute)
 ```bash
@@ -70,13 +91,16 @@ http://localhost:8080/BookHub/books/
 
 **Problem: Can't connect to database**
 ```bash
-# Check MySQL is running
-# Windows:
-net start MySQL80
-
-# Linux/Mac:
-sudo systemctl status mysql
+# Verify your Aiven service is running in Aiven Console
+# Check that your credentials in database.properties are correct
+# Ensure the URL includes ?sslmode=require
+# Verify the database name matches your Aiven database
 ```
+
+**Problem: SSL connection error**
+- Aiven requires SSL connections
+- Make sure your connection URL has `?sslmode=require`
+- Update PostgreSQL JDBC driver if needed
 
 **Problem: Port 8080 in use**
 - Stop other applications on port 8080
@@ -94,9 +118,9 @@ See the detailed [README.md](README.md) for:
 - Project architecture
 
 ## Default Configuration
-- **Database**: localhost:3306/bookhub_db
-- **Username**: root
-- **Password**: root (change in database.properties)
+- **Database**: Aiven PostgreSQL (Cloud-hosted)
+- **Connection**: SSL required (sslmode=require)
+- **Default Database**: defaultdb (or your chosen database name)
 - **Tomcat Port**: 8080
 - **Context Path**: /BookHub
 
